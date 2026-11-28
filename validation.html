@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="bingbot" content="noindex, nofollow, noarchive">
+<title>Pacific KBDI Validation</title>
+<link rel="stylesheet" href="site.css">
+<script>try{var t=localStorage.getItem("kbdi-theme");if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+</head><body>
+<header class="top"><div class="bar"><a class="brand" href="index.html">Pacific KBDI · Research</a>
+<nav><a href="index.html">Maps</a><a href="methods.html">Methods</a><a href="validation.html" class="on">Validation</a></nav>
+<button class="theme-btn" id="theme" type="button">Theme</button></div></header>
+<div class="wrap">
+<div class="banner"><b>Experimental, not peer reviewed.</b> Checks are against operational station indices and fire records, not against
+measured soil moisture.</div>
+<h1>Validation</h1>
+<p class="sub">How each map compares with the KBDI that FEMS computes at Remote Automatic Weather Stations (RAWS), recomputed every day,
+and how Hawaiʻi's map lines up with where and when fires burned. The design is in <a href="methods.html#check">Methods §7</a>.</p>
+
+<div class="card"><h2>Reading the station tables</h2>
+<ul class="note">
+<li><b>r</b>: Pearson correlation of the daily map-cell KBDI with FEMS's station KBDI over the checked period.</li>
+<li><b>Bias</b>: mean (map − FEMS). <b>MAE</b>: mean absolute difference, in KBDI units.</li>
+<li><b>Within 1 class</b>: share of days the map is in the same or an adjacent 100-unit class as FEMS.</li>
+<li><b>Hit / False ≥ 400</b>: of FEMS's days at or above 400, the share the map also put there; of FEMS's days below 400, the share the map put at or above.</li>
+<li><b>FEMS R / Map R</b>: the mean annual rainfall each index used at that point (inches).</li>
+<li>Periods start after each domain's one-year spin-up. AMME CS (Saipan) is checked from 2023 on; its FEMS record before then is not usable (Methods §5).</li>
+</ul></div>
+<div id="vtables"></div>
+
+<div class="card"><h2 id="fires">Hawaiʻi: KBDI on fire days</h2>
+<p class="note">October 2021 – November 2026. KBDI sampled at each fire's cell on its date, against 20,000 random land cells on every day.
+POD is the share of fire days at or above a KBDI value; "land" is the share of all land-days at or above it; lift is their ratio. 500 is the
+NWS Honolulu Red Flag KBDI criterion; 600 (NWS Guam's value, and Honolulu's earlier one) is shown for comparison. AUC is the probability that a
+fire day's KBDI exceeds a random land-day's. Both annual-rain normals are shown; the map uses the Rainfall Atlas. Snapshot of 19 November 2026.</p>
+<div class="scroll"><table id="ftable"></table></div>
+<p class="note" id="fsum"></p>
+<p class="note">Under either normal most fire days sit below 500 (median fire-day KBDI about 390–480), and in 2026 almost none reached it.
+In Hawaiʻi, fire is driven more by fine grass fuels, wind and ignitions than by deep drought, so KBDI is context rather than a trigger;
+HFO's criteria rightly require wind and humidity as well.</p></div>
+
+<footer><p>Experimental and not peer reviewed. Sources and references: <a href="methods.html#refs">Methods</a>.</p></footer>
+</div>
+<script src="data/site_data.js"></script>
+<script src="app.js"></script>
+<script>KBDIapp.validation();</script>
+</body></html>

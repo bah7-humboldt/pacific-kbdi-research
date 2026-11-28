@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="bingbot" content="noindex, nofollow, noarchive">
+<title>Pacific KBDI Methods</title>
+<link rel="stylesheet" href="site.css">
+<script>try{var t=localStorage.getItem("kbdi-theme");if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+</head><body>
+<header class="top"><div class="bar"><a class="brand" href="index.html">Pacific KBDI · Research</a>
+<nav><a href="index.html">Maps</a><a href="methods.html" class="on">Methods</a><a href="validation.html">Validation</a></nav>
+<button class="theme-btn" id="theme" type="button">Theme</button></div></header>
+<div class="wrap paper">
+<div class="banner"><b>Experimental, not peer reviewed.</b> This page documents an in-development research product. The methods,
+choices and checks below have not been through independent scientific review, and the maps are not an official product of any agency.</div>
+
+<h1>Gridded Keetch–Byram Drought Index for Hawaiʻi and the U.S. Pacific Islands: data and methods</h1>
+<p class="sub">Technical description, version of 19 November 2026. Daily maps for Hawaiʻi; Guam; Saipan, Tinian and Rota (Commonwealth
+of the Northern Mariana Islands, CNMI); and Tutuila and Aunuʻu (American Samoa).</p>
+
+<div class="card"><b>Summary.</b> The Keetch–Byram Drought Index (KBDI; Keetch and Byram 1968) is computed every day on fine grids
+over four U.S. Pacific island groups, using a method similar to the KBDI product the Texas A&amp;M Forest Service produces daily for the State of Texas (TFS, n.d.). Each island
+group uses the best daily rainfall and maximum-temperature data available to it: gauge-based gridded analyses from the Hawaiʻi Climate
+Data Portal for Hawaiʻi and American Samoa (Longman et al. 2019, 2024; Kodama et al. 2024), radar–gauge estimates for Guam (Zhang et al.
+2016), and island rain gauges distributed by a climatological pattern for Saipan, Tinian and Rota (Menne et al. 2012; Daly et al. 2008).
+Each grid is checked daily against the KBDI that the USDA Forest Service Fire Environment Mapping System (FEMS) computes at Remote Automatic
+Weather Stations (RAWS). In Hawaiʻi the map tracks the station index closely (median r 0.91 at 22 RAWS); elsewhere the checks rest on one
+or two stations.</div>
+
+<div class="card"><b>Contents</b><ol class="toc">
+<li><a href="#kbdi">The index</a></li><li><a href="#realtime">Real-time gridded method</a></li>
+<li><a href="#hi">Hawaiʻi</a></li><li><a href="#gu">Guam</a></li><li><a href="#mp">Saipan, Tinian and Rota</a></li>
+<li><a href="#as">American Samoa</a></li><li><a href="#check">Validation design</a></li>
+<li><a href="#limits">Limitations</a></li><li><a href="#ops">Daily production</a></li><li><a href="#refs">References</a></li></ol></div>
+
+<h2 id="kbdi">1. The index</h2>
+<p>KBDI is a daily water balance for the upper soil and duff layer, assumed to hold 8 inches of available water at field capacity. The
+index <i>Q</i> is the depletion in hundredths of an inch: 0 is saturated, 800 is absolutely dry (Keetch and Byram 1968). Each day the
+index first falls by net rainfall, then rises by a drought factor that grows with temperature and with the site's mean annual rainfall:</p>
+<div class="eq">d<i>Q</i> = [ (800 − <i>Q</i>) × (0.968 e<sup>0.0486 <i>T</i></sup> − 8.30) × 10<sup>−3</sup> ] ⁄ [ 1 + 10.88 e<sup>−0.0441 <i>R</i></sup> ]</div>
+<p>with <i>T</i> the daily maximum air temperature (°F), <i>R</i> the mean annual rainfall (inches) and a one-day step; d<i>Q</i> is set to 0
+when the expression is negative (cool days). The <i>R</i> term carries the original authors' assumption that vegetation in wetter climates
+transpires faster, so a site with higher annual rain dries faster between rains. That makes <i>R</i> a consequential choice in the
+islands, where it ranges from under 10 to over 300 inches across a few kilometres (§3).</p>
+<p><b>Net rainfall.</b> A rain day is one with at least 0.01 in. Within a run of consecutive rain days, the first 0.20 in (cumulative) is
+treated as interception and does not reduce the index; every hundredth of an inch after that lowers <i>Q</i> by one unit
+(Keetch and Byram 1968; TFS n.d.). <b>Interpretation</b> (TFS n.d.): 0–200, deep fuels moist and not contributing to intensity; 200–400,
+fuels beginning to contribute; 400–600, lower litter and duff contribute and burn actively; 600–800, severe drought with deep-burning fires.
+KBDI enters the National Weather Service's Red Flag criteria in both Pacific forecast offices that publish them. NWS Honolulu
+triggers a Red Flag event for mainly leeward areas when KBDI ≥ 500 at named stations (and/or on consultation with fire agencies), relative
+humidity ≤ 45% for 2 or more hours and sustained wind ≥ 26 mph for 2 or more hours, issued island by island (NWS Honolulu n.d.; earlier
+versions of the criteria used KBDI ≥ 600). NWS Guam uses KBDI ≥ 600 with two-minute ASOS wind ≥ 17 kt (or 20-ft wind ≥ 14 kt), minimum
+relative humidity below 60% and low 10-hour fuel moisture (NWS Guam n.d., 2021). No published criteria were found for American Samoa.</p>
+<p>KBDI was formulated for the southeastern United States. Its use in the tropical Pacific follows operational practice: FEMS computes it at
+every Pacific RAWS from each station's catalogued mean annual precipitation (USDA Forest Service 2011, 2025). Values in high-rainfall
+tropical settings recover quickly after rain and climb quickly between rains, so a location is best read against its own history.</p>
+
+<h2 id="realtime">2. Real-time gridded method</h2>
+<p>The gridded procedure is similar to the KBDI product the Texas A&amp;M Forest Service produces daily for the State of Texas (TFS n.d.). That product runs KBDI daily on a 4 km
+grid from gauge-corrected NEXRAD rainfall accumulated 08:00–08:00 local time, NWS first-order maximum temperatures interpolated by inverse
+distance, and the PRISM 30-year mean annual precipitation; it summarizes each county's mean, minimum and maximum, flags cells above 575,
+and produces a forecast by holding the current day's maximum temperature with no rain. The islands keep the analysis steps, with
+island data substituted (Table 1); the no-rain forecast is not produced here. Each grid cell is stepped forward independently from the archive start with <i>Q</i> = 0; the first
+365 days are treated as spin-up and are excluded from every statistic. The index on day <i>X</i> uses rainfall for the 24 hours that end on
+the morning of <i>X</i> and the maximum temperature of day <i>X</i> − 1.</p>
+<div class="scroll"><table>
+<caption class="note" style="caption-side:top;text-align:left;margin-bottom:6px"><b>Table 1.</b> Inputs by island group.</caption>
+<tr><th></th><th>Texas (TFS)</th><th>Hawaiʻi</th><th>Guam</th><th>Saipan · Tinian · Rota</th><th>American Samoa</th></tr>
+<tr><td>Daily rain</td><td>NEXRAD, gauge bias-corrected, 4 km</td><td>HCDP daily rainfall, 250 m</td><td>MRMS multi-sensor QPE, ~500 m</td><td>Island gauges × PRISM pattern, 80 m</td><td>HCDP Samoa daily rainfall, 90 m</td></tr>
+<tr><td>Daily Tmax</td><td>NWS stations, IDW</td><td>HCDP daily Tmax, 250 m</td><td>RTMA, 2.5 km</td><td>Saipan / Rota airport</td><td>Pago Pago airport</td></tr>
+<tr><td>Annual rain <i>R</i></td><td>PRISM 30-yr</td><td>Rainfall Atlas 1978–2007</td><td>MRMS archive mean</td><td>PRISM 1971–2000</td><td>HCDP 1991–2020</td></tr>
+<tr><td>Summary units</td><td>Counties</td><td>Four island-group zones</td><td>Island</td><td>Islands</td><td>Tutuila west/east, Aunuʻu</td></tr>
+<tr><td>Archive start</td><td>—</td><td>15 Oct 2020</td><td>15 Oct 2020</td><td>1 Jan 2011</td><td>1 Jan 2011</td></tr>
+</table></div>
+
+<h2 id="hi">3. Hawaiʻi</h2>
+<p><b>Rainfall and temperature.</b> Daily rainfall and daily maximum temperature come from the Hawaiʻi Climate Data Portal (HCDP;
+Longman et al. 2024), on its statewide 250 m grid (0.00225°; 287,983 land cells; Niʻihau is outside the grid). The rainfall maps
+interpolate the state's gauge networks (Longman et al. 2019); the temperature maps use an elevation-based piecewise regression with a
+reported mean absolute error of 1.7 °C for Tmax (Kodama et al. 2024). An HCDP rain day <i>D</i> is the gauges' morning reading of
+<i>D</i> + 1; matching daily HCDP rain against NOAA MRMS at that one-day shift gave a correlation of 0.76 against 0.49 unshifted, so KBDI
+date <i>X</i> uses HCDP day <i>X</i> − 1 for both rain and Tmax.</p>
+<p><b>Radar rainfall evaluated.</b> NOAA MRMS multi-sensor radar rainfall (Zhang et al. 2016) was evaluated as the Hawaiʻi rain source
+and came up short, for two reasons. It under-reads the gauges: against 212 GHCN-Daily rain gauges (Menne et al. 2012) it caught 0.81 of
+gauge rainfall from October 2020 through February 2025, then 0.51 from March 2025 on (Fig. 1a). That drop shows in every MRMS rainfall
+product, radar-only included. With too little rain the index runs too dry. KBDI computed from MRMS rain (with URMA Tmax and the MRMS
+archive's own mean annual rain) scored a median r of 0.76 and a mean absolute error of 91 against FEMS station KBDI at 22 RAWS. HCDP
+scored 0.91 and 55 (Fig. 1b). Since March 2025 the MRMS index has run a median 51 points above the stations, against 8 for HCDP. The
+largest miss is at Hakalau: MRMS drove the index to about 750 in 2025 and kept it high after the station's index fell to near zero
+late that year (Fig. 1c).
+MRMS did slightly better at a few dry leeward stations (Lānaʻi 1, Kohala Ranch, Waimea Heights), but not enough to offset the drift.</p>
+<figure><img class="mapimg" src="img/sources_mrms_HI.png" alt="Three panels: monthly MRMS-to-gauge rain ratio for Hawaiʻi dropping from about 0.8 to about 0.5 after March 2025; per-RAWS KBDI error, MRMS versus HCDP; and KBDI at Hakalau RAWS with the MRMS series far above the station from 2025.">
+<figcaption><b>Figure 1.</b> MRMS as a Hawaiʻi rain source. (a) Monthly MRMS rain over gauge rain at GHCN-Daily gauges, median and middle
+half of gauges, for months with at least 1 in at the gauge. (b) Mean absolute error of KBDI against FEMS station KBDI at each RAWS,
+MRMS rain (orange) and HCDP rain (blue, adopted), October 2021 – November 2026. (c) KBDI at Hakalau RAWS, the station MRMS misses most.</figcaption></figure>
+<p><b>Mean annual rain.</b> FEMS's own station values of mean annual precipitation were traced to the 1978–2007 annual grid of the Rainfall
+Atlas of Hawaiʻi (Giambelluca et al. 2013): across 69 Hawaiʻi stations the median ratio of the FEMS value to the Atlas value is 1.00
+(r 0.997), with 56 stations matching to 0.01 in within about 2 km of their listed coordinates. PRISM's 1971–2000 Hawaiʻi normal does not
+match (median ratio 0.93). FEMS documentation states only that the values were updated nationally in 2025 (USDA Forest Service 2025) and
+that they may come from PRISM or station records (Linn et al. 2026). Two candidate normals were compared on the same grid:</p>
+<ul>
+<li><b>HCDP 1991–2020</b> (built from 360 monthly HCDP maps) sits a median 25% below the FEMS values at the stations. Roughly 12 points of that
+are real drying (HCDP's own legacy series, 1990–2012 vs 1978–2007, ratio 0.88) and about 6 points a difference between HCDP's legacy and
+current map series over the same years.</li>
+<li><b>Rainfall Atlas 1978–2007</b> reproduces the FEMS station values.</li>
+</ul>
+<p>Against fire occurrence (§7), the Atlas normal ranks fire days better (AUC 0.684 vs 0.671 on satellite fire detections; 0.730 vs 0.712
+on reported fire starts). At NWS Honolulu's Red Flag value of 500 it catches 40% of satellite fire days against 25% (lift 1.79 vs 1.42), and
+at the same share of land flagged, 31% against 25%. The map therefore uses the Atlas normal, which also keeps it consistent with the RAWS
+index that fire managers already see (map vs FEMS bias −4 instead of −40), at the cost of describing a wetter, earlier climate than today's.</p>
+<p><b>Red Flag stations.</b> NWS Honolulu judges KBDI at named leeward stations: Waimea Heights and/or Mana (Kauaʻi), Honolulu Airport
+(Oʻahu), Makapulapai (Molokaʻi), Lanai1 (Lānaʻi), Kealia Pond (Maui), and Kohala Ranch and/or Waikoloa (Hawaiʻi Island) (NWS Honolulu n.d.).
+All but Honolulu Airport are RAWS on this map; the Maps page lists the map and FEMS values at each against 500.</p>
+<p><b>Zones</b> are the four island groups of the Hawaiʻi zone layer (Kauaʻi, Oʻahu, Maui Nui, Hawaiʻi Island). Wildfire in Hawaiʻi is
+overwhelmingly human-caused and concentrated in nonnative grass and shrublands on leeward slopes (Trauernicht et al. 2015).</p>
+
+<h2 id="gu">4. Guam</h2>
+<p>Rainfall is the NOAA Multi-Radar Multi-Sensor (MRMS) 24-hour multi-sensor quantitative precipitation estimate (Pass 2) for the Guam domain
+(Zhang et al. 2016), accumulated to 08:00 ChST, on its ~0.005° grid clipped to land; maximum temperature is the warmest of the 13:00–15:00
+ChST NOAA Real-Time Mesoscale Analyses (RTMA; De Pondeca et al. 2011). <i>R</i> is the mean of the MRMS archive since October 2020. MRMS for
+Guam has about 740 days without a file since October 2020; on those days each cell follows the day-to-day change of the nearest RAWS's FEMS
+KBDI instead of counting the day as dry. Against the one RAWS (DANDAN) the map gives r 0.81–0.84 with a bias near +40 and a 32% false-alarm
+rate at 400, so it is graded moderate.</p>
+<p><b>Fire-weather use.</b> NWS Guam issues a daily fire danger rating that was based on KBDI alone (four categories, Extreme at 600–800)
+until November 2019 and since then has combined KBDI with wind in five tiers: Low (0–299), Moderate (300–499), High (500–800 with low wind), Very High
+(600–699 with strong wind) and Extreme (700–800 with strong wind) (NWS Guam 2021). Its Red Flag criteria use KBDI ≥ 600 (§1). The office's
+KBDI is judged from observations at its Tiyan office (PGUM) with supplementary island gauges and the DANDAN RAWS (NWS Guam 2021); this map
+does not include wind, so it can inform the KBDI part of the rating only.</p>
+
+<h2 id="mp">5. Saipan, Tinian and Rota</h2>
+<p><b>Which islands.</b> The CNMI State Wildland Fire Plan places all wildfire prevention and suppression on Saipan, Tinian and Rota, the
+only three of fourteen islands with a significant population (CNMI State Forester n.d.). Between 2016 and 2020 the islands recorded
+8–41 (Saipan), 10–47 (Tinian) and 6–120 (Rota) wildfires a year, with up to 8.1% of Rota burned in one year (CNMI Forestry 2020).
+Sword-grass savanna on eroded soils is the main fire-prone vegetation (CNMI State Forester n.d.; Bubb and Williams 2022). The northern
+islands (fewer than ten residents, active volcanoes), uninhabited Aguijan and the Farallon de Medinilla bombing range are not mapped.</p>
+<p><b>Radar rainfall evaluated.</b> MRMS rainfall for the Guam radar domain was evaluated for these islands and came up short. The
+islands lie 80–200 km from the radar, where the beam overshoots much of the rain. At the gauges MRMS caught 0.35 of rainfall at Saipan
+airport and 0.46 at Rota airport, January 2021 – November 2026, and it missed whole wet-season months (Fig. 2a, b). Its own mean annual
+rain at the AMME CS RAWS is 20 in, against 78 in for the station. The Guam domain also has no file at all on 728 of those 2,145 days. KBDI
+from MRMS rain at AMME CS tracked the station poorly (r 0.20, mean absolute error 239, 2023–26). The gauge-based map described below scored
+r 0.88 and 77 (Fig. 2c). Open satellite estimates were reviewed but not adopted:
+CMORPH2 near-real-time is distributed only at 0.25°, coarser than the islands; PERSIANN-CCS and PDIR-Now are open at ~4 km but only as
+global daily files; IMERG requires a registered login.</p>
+<figure><img class="mapimg" src="img/sources_mrms_MP.png" alt="Three panels: monthly rain at Saipan and Rota airports, MRMS far below the gauge bars; KBDI at AMME CS RAWS with the MRMS series departing from the station while the gauge-based map follows it.">
+<figcaption><b>Figure 2.</b> MRMS as a rain source for Saipan, Tinian and Rota. (a, b) Monthly rain at the Saipan and Rota airport gauges
+(bars) and MRMS at the gauge (line; gaps are months without MRMS files). (c) KBDI at AMME CS RAWS: FEMS station, MRMS rain, and the
+adopted gauge × PRISM map, all with the map's island Tmax. FEMS KBDI at AMME CS is used from 2023 on (see below).</figcaption></figure>
+<p><b>Rainfall.</b> Each island's daily rain is an index: each gauge's daily total divided by that gauge's 2011–2025 mean, averaged over
+the island's reporting gauges. Cell rainfall is that index times the cell's PRISM 1971–2000 annual normal on PRISM's 80 m Pacific Islands
+grid (PRISM Climate Group 2006; Daly et al. 2008), so each island keeps its observed day-to-day timing while wetter uplands receive
+proportionally more. Gauges are the GHCN-Daily records for Saipan International Airport and Capitol Hill (Saipan), Tinian, and Rota Airport
+(Menne et al. 2012). GHCN-Daily posts about five days late, so the latest days use the Saipan and Rota airport ASOS daily totals from the
+Iowa Environmental Mesonet, the same gauges reported the same day. Tinian's gauge is incomplete and the West Tinian ASOS has reported no
+rainfall since 2013, so Tinian takes Saipan's index when its own gauge is missing (daily r 0.51 with Tinian's gauge; totals within 5%).
+PRISM's normal agrees with the airport gauges (Saipan 71 vs 69 in a year, Tinian 80 vs 85, Rota 90 vs 95); Capitol Hill reads 104
+against PRISM's 77, which is why each gauge is scaled by its own mean rather than by PRISM.</p>
+<p><b>Temperature and <i>R</i>.</b> Maximum temperature is the Saipan airport value for Saipan and Tinian and the Rota airport value for Rota
+(ASOS, then GHCN-Daily, then the 1991–2020 day-of-year mean for old gaps), without elevation adjustment. <i>R</i> is the PRISM 1971–2000
+normal. Against FEMS at AMME CS for 2023–26 the map gives r 0.88, bias +2, MAE 77 and 93% of the station's days at or above 400. FEMS's KBDI at
+AMME CS averages about 33 in every year from 2016 to 2022 and 381–510 from 2023 while the airport gauge shows ordinary dry seasons
+throughout, so its earlier record is excluded from checks and gap filling. Tinian and Rota have no RAWS to check against.
+NWS Guam's fire danger rating and Red Flag criteria are written for Guam (NWS Guam 2021); no separate criteria for these islands were found,
+so 600 is shown on the Maps page only as a reference.</p>
+
+<h2 id="as">6. American Samoa</h2>
+<p><b>Rainfall</b> is the HCDP American Samoa daily rainfall map, 90 m, covering Tutuila and Aunuʻu (16,594 land cells); Manuʻa is outside it.
+The one-day alignment holds here too: HCDP Samoa rain matches the Pago Pago airport gauge at r 0.95 at that shift and 0.28 unshifted.
+<b><i>R</i></b> is the HCDP Samoa 1991–2020 normal built from its monthly maps (Tutuila 146–160 in, Aunuʻu 88 in). FEMS gives both Samoa RAWS
+the same 223.75 in, a value that matches neither PRISM's 1971–2000 Tutuila normal nor HCDP, so it was not used.</p>
+<p><b>Temperature.</b> HCDP has no Samoa temperature maps. Maximum temperature is the Pago Pago airport GHCN-Daily value applied island-wide;
+for days the airport has not yet posted, the HCDP Samoa mesonet's daily maximum at two stations is reduced to airport level. An
+elevation-cooled field (−8.5 °C per km, fitted to the mesonet) was tested and rejected: it left the map 140 below FEMS at Toa Ridge. Recomputing
+FEMS's KBDI from the RAWS's own hourly observations reproduces FEMS (r 0.93 and 0.91), and swapping inputs one at a time placed the
+difference in temperature, not rain: RAWS daily maxima vary about twice as much as the airport's, and hot days add disproportionate drying
+because the drying term is exponential in <i>T</i>. With airport Tmax unadjusted (as in TFS's station-based temperatures), the map gives
+r 0.80 / bias −12 at Siufaga Ridge and r 0.65 / bias −19 at Toa Ridge (2012–26). Aunuʻu has no station; its high values come from HCDP mapping
+it much drier than Tutuila. No fire-weather criteria were found for the Pago Pago office, so the Maps page marks the Honolulu (500) and
+Guam (600) values for reference only.</p>
+
+<h2 id="check">7. Validation design</h2>
+<p><b>Against station KBDI.</b> Each day, the map cell containing each RAWS is compared with the KBDI that FEMS computes from that station's
+own observations. Scores are the Pearson correlation, mean bias, mean absolute error, the share of days in the same or an adjacent
+100-unit class, and the hit and false-alarm rates at 400. FEMS station KBDI is not ground truth: it rests on a single gauge and thermometer,
+and its <i>R</i> values have their own history (§3). Agreement shows that the gridded index reproduces the operational one, not that either
+is right. Station-by-station results are on the <a href="validation.html">Validation</a> page.</p>
+<p><b>Against fire occurrence (Hawaiʻi).</b> KBDI on each day was sampled at 2,463 VIIRS 375 m active-fire cell-days (Schroeder et al. 2014;
+vegetation-fire type, nominal or high confidence, Kīlauea and Mauna Loa eruption zones removed) and at 92 reported fire starts from the FPA
+Fire Occurrence Database and InFORM (Short 2026), October 2021–November 2026, against 20,000 random land cells on every day. Reported starts
+are few because Hawaiʻi's county and state fire reports largely stop entering the database after 2020. Scores are the area under the ROC
+curve and, at NWS Honolulu's Red Flag value of 500 (and at 600 for comparison), the share of fire days caught against the share of land-days
+flagged. This tests only the KBDI part of the criteria, cell by cell, not the station-based warnings themselves.</p>
+
+<h2 id="limits">8. Limitations</h2>
+<ul>
+<li>Not peer reviewed; methods and grades may change as checks accumulate.</li>
+<li>Outside Hawaiʻi, checks rest on one or two RAWS per island group; Tinian, Rota and Aunuʻu are unchecked.</li>
+<li>Gridded rain smooths small convective cells and cannot resolve rain shadows finer than its sources (250 m HCDP; 80 m PRISM pattern
+  scaled from one or two gauges per island; ~500 m MRMS).</li>
+<li>Single-station Tmax (CNMI, Samoa) cannot represent sunny leeward versus cloudy windward afternoons.</li>
+<li>The annual-rain choices (§3, §5, §6) set how fast each cell dries; Hawaiʻi's follows FEMS, Samoa's does not (FEMS's value is a placeholder).</li>
+<li>KBDI describes deep drying only; fine-fuel dryness, wind, humidity and ignitions decide whether and how fire spreads.</li>
+<li>Inputs arrive on their own schedules; a domain's map date can lag a day when an input is late.</li>
+</ul>
+
+<h2 id="ops">9. Daily production and display</h2>
+<p>The maps are produced once a day on a single workstation by open-source Python code: new daily inputs are fetched, every domain is
+re-stepped from its archive start, the RAWS checks are rerun, and this site is rebuilt and republished. A 30-day archive of maps is kept on
+the Maps page. The interactive map shows each grid at its own resolution over Esri basemaps (Leaflet): the grid's rows are resampled once
+to even steps of Web Mercator latitude so every cell sits where it belongs on the basemap, and a second, lossless image carries each
+cell's exact KBDI value for the hover readout. RAWS markers are coloured by FEMS's KBDI for the station on the same scale. The static
+research figure for each day is linked below the map. Data are retrieved from public services: HCDP (University of Hawaiʻi; API), NOAA MRMS, RTMA and GHCN-Daily (NOAA Open Data
+Dissemination on AWS), Iowa Environmental Mesonet ASOS daily summaries, PRISM Pacific Islands normals, the Rainfall Atlas of Hawaiʻi, and USDA
+Forest Service FEMS. Please cite the underlying datasets below when using these maps.</p>
+
+<h2 id="refs">References</h2>
+<ol class="refs">
+<li>Bubb, I. E., and Z. B. Williams, 2022: Spatial and temporal patterns of fire on Saipan, CNMI. <i>Pacific Science</i>, 76(1). <a href="https://doi.org/10.2984/76.1.1">doi:10.2984/76.1.1</a></li>
+<li>CNMI Forestry, 2020: <i>Commonwealth of the Northern Mariana Islands Forest Action Plan 2020–2030: Statewide Forest Resource Assessments &amp; Strategies.</i> CNMI Department of Lands and Natural Resources.</li>
+<li>CNMI State Forester, n.d.: <i>Draft Commonwealth of the Northern Mariana Islands State Wildland Fire Plan 2014–2024.</i> CNMI Forestry / Department of Lands and Natural Resources. <a href="https://opd.gov.mp/library/reports/draft-state-wildland-fire-plan.pdf">opd.gov.mp</a></li>
+<li>Daly, C., M. Halbleib, J. I. Smith, W. P. Gibson, M. K. Doggett, G. H. Taylor, J. Curtis, and P. P. Pasteris, 2008: Physiographically sensitive mapping of climatological temperature and precipitation across the conterminous United States. <i>International Journal of Climatology</i>, 28, 2031–2064. <a href="https://doi.org/10.1002/joc.1688">doi:10.1002/joc.1688</a></li>
+<li>De Pondeca, M. S. F. V., and Coauthors, 2011: The Real-Time Mesoscale Analysis at NOAA's National Centers for Environmental Prediction: Current status and development. <i>Weather and Forecasting</i>, 26, 593–612. <a href="https://doi.org/10.1175/WAF-D-10-05037.1">doi:10.1175/WAF-D-10-05037.1</a></li>
+<li>Giambelluca, T. W., Q. Chen, A. G. Frazier, J. P. Price, Y.-L. Chen, P.-S. Chu, J. K. Eischeid, and D. M. Delparte, 2013: Online Rainfall Atlas of Hawaiʻi. <i>Bulletin of the American Meteorological Society</i>, 94, 313–316. <a href="https://doi.org/10.1175/BAMS-D-11-00228.1">doi:10.1175/BAMS-D-11-00228.1</a></li>
+<li>Iowa Environmental Mesonet, n.d.: ASOS/AWOS daily summary archive. Iowa State University. <a href="https://mesonet.agron.iastate.edu/">mesonet.agron.iastate.edu</a></li>
+<li>Keetch, J. J., and G. M. Byram, 1968: <i>A Drought Index for Forest Fire Control.</i> Research Paper SE-38, USDA Forest Service, Southeastern Forest Experiment Station, Asheville, NC (revised 1988).</li>
+<li>Kodama, K. M., E. Kourkchi, R. J. Longman, M. P. Lucas, S. M. Bateni, Y.-F. Huang, A. Kagawa-Viviani, J. Mclean, S. B. Cleveland, and T. W. Giambelluca, 2024: Mapping daily air temperature over the Hawaiian Islands from 1990 to 2021 via an optimized piecewise linear regression technique. <i>Earth and Space Science</i>, 11, e2023EA002851. <a href="https://doi.org/10.1029/2023EA002851">doi:10.1029/2023EA002851</a></li>
+<li>Linn, S., P. Schlobohm, C. Maxwell, and L. Williams, 2026: <i>Understanding the Basics of NFDRSv4.</i> USDA Forest Service National Fire Danger Rating System program.</li>
+<li>Longman, R. J., A. G. Frazier, A. J. Newman, and Coauthors, 2019: High-resolution gridded daily rainfall and temperature for the Hawaiian Islands (1990–2014). <i>Journal of Hydrometeorology</i>, 20(3). <a href="https://doi.org/10.1175/JHM-D-18-0112.1">doi:10.1175/JHM-D-18-0112.1</a></li>
+<li>Longman, R. J., and Coauthors, 2024: The Hawaiʻi Climate Data Portal (HCDP). <i>Bulletin of the American Meteorological Society</i>, 105(7). <a href="https://doi.org/10.1175/BAMS-D-23-0188.1">doi:10.1175/BAMS-D-23-0188.1</a></li>
+<li>Menne, M. J., I. Durre, R. S. Vose, B. E. Gleason, and T. G. Houston, 2012: An overview of the Global Historical Climatology Network-Daily database. <i>Journal of Atmospheric and Oceanic Technology</i>, 29, 897–910. <a href="https://doi.org/10.1175/JTECH-D-11-00103.1">doi:10.1175/JTECH-D-11-00103.1</a></li>
+<li>NWS Guam, n.d.: Fire Weather Watch / Red Flag Warning criteria. National Weather Service Forecast Office Tiyan, Guam. Accessed 19 November 2026. <a href="https://www.weather.gov/gum/fireweatherhelp">weather.gov/gum/fireweatherhelp</a></li>
+<li>NWS Guam, 2021: <i>Guam Fire Weather Operations Plan 2022</i> (updated October 2021). National Weather Service Forecast Office Tiyan, Guam. <a href="https://www.weather.gov/media/gum/Guam%20Fire%20Weather%20Operation%20Plan%202022%20-%20Web.pdf">weather.gov/media/gum</a></li>
+<li>NWS Honolulu, n.d.: Fire Weather Watch / Red Flag Warning criteria. National Weather Service Forecast Office Honolulu. Accessed 19 November 2026. <a href="https://www.weather.gov/hfo/rfw_criteria">weather.gov/hfo/rfw_criteria</a></li>
+<li>PRISM Climate Group, 2006: Pacific Islands average monthly and annual precipitation, 1971–2000 (Hawaiʻi, Guam, CNMI, American Samoa). Oregon State University. <a href="https://prism.oregonstate.edu/normals_other/pacisl.php">prism.oregonstate.edu</a></li>
+<li>Schroeder, W., P. Oliva, L. Giglio, and I. A. Csiszar, 2014: The New VIIRS 375 m active fire detection data product: Algorithm description and initial assessment. <i>Remote Sensing of Environment</i>, 143, 85–96. <a href="https://doi.org/10.1016/j.rse.2013.12.008">doi:10.1016/j.rse.2013.12.008</a></li>
+<li>Short, K. C., 2026: <i>Spatial wildfire occurrence data for the United States, 1992–2024 [FPA_FOD_20260615].</i> 7th ed. USDA Forest Service Research Data Archive. <a href="https://doi.org/10.2737/RDS-2013-0009.7">doi:10.2737/RDS-2013-0009.7</a></li>
+<li>Texas A&amp;M Forest Service (TFS), n.d.: <i>Real-time Drought Assessment System of Texas A&amp;M Forest Service.</i> <a href="https://twc.tamu.edu/docs/TFS_KBDI_Update.pdf">twc.tamu.edu</a></li>
+<li>Trauernicht, C., E. Pickett, C. P. Giardina, C. M. Litton, S. Cordell, and A. Beavers, 2015: The contemporary scale and context of wildfire in Hawaiʻi. <i>Pacific Science</i>, 69(4), 427–444.</li>
+<li>USDA Forest Service, 2011: <i>WIMS User's Guide, Chapter 6: Working with Station Information</i> (average annual precipitation and KBDI).</li>
+<li>USDA Forest Service, 2025: <i>Summary of Changes from WIMS to Fire Environment Mapping System (FEMS)</i>, version 1.</li>
+<li>Zhang, J., and Coauthors, 2016: Multi-Radar Multi-Sensor (MRMS) quantitative precipitation estimation: Initial operating capabilities. <i>Bulletin of the American Meteorological Society</i>, 97, 621–638. <a href="https://doi.org/10.1175/BAMS-D-14-00174.1">doi:10.1175/BAMS-D-14-00174.1</a></li>
+</ol>
+<footer><p>Experimental and not peer reviewed. Offered without warranty for research and discussion. Not an official forecast, warning
+or fire danger rating.</p></footer>
+</div>
+<script src="app.js"></script>
+<script>KBDIapp.theme();</script>
+</body></html>

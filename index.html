@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="bingbot" content="noindex, nofollow, noarchive">
+<title>Pacific KBDI Research</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link rel="stylesheet" href="site.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 12c2-4 4-6 6-6s4 2 6 6z' fill='%23eb6834'/%3E%3Ccircle cx='8' cy='4' r='2' fill='%23eda100'/%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem("kbdi-theme");if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+</head><body>
+<header class="top"><div class="bar"><a class="brand" href="index.html">Pacific KBDI · Research</a>
+<nav><a href="index.html" class="on">Maps</a><a href="methods.html">Methods</a><a href="validation.html">Validation</a></nav>
+<button class="theme-btn" id="theme" type="button">Theme</button></div></header>
+<div class="wrap">
+<div class="banner"><b>Experimental research product, not peer reviewed.</b> These maps are an independent, in-development
+analysis built from public data. They are not an official forecast or warning, and not a product of the National Weather Service, FEMS
+or any fire agency. For decisions, use official sources: <a href="https://www.weather.gov/hfo/">NWS Honolulu</a>,
+<a href="https://www.weather.gov/gum/">NWS Guam</a>, <a href="https://www.weather.gov/ppg/">NWS Pago Pago</a> and your
+agency's fire danger ratings.</div>
+<h1>Gridded Keetch–Byram Drought Index for Hawaiʻi and the U.S. Pacific Islands</h1>
+<p class="sub">The Keetch–Byram Drought Index (KBDI) estimates the soil-moisture deficit in the upper soil and duff, from 0 (saturated)
+to 800 (absolutely dry), in hundredths of an inch of water. It is the drought term that fire-danger systems use to judge how much
+deep fuel is available to burn. These maps compute it every day on a fine grid, using a method similar to the KBDI product the Texas
+A&amp;M Forest Service produces daily for the State of Texas, with the best daily rain and temperature data available for each island group.
+<a href="methods.html">How the maps are made →</a></p>
+<div class="tabs" id="tabs" role="tablist"></div>
+<p class="note" id="updated"></p>
+
+  <div class="card">
+    <div class="controls">
+      <label class="note">Date <select id="date"></select></label>
+      <label class="note">Basemap <select id="base">
+        <option value="gray">Light gray</option><option value="dark">Dark gray</option>
+        <option value="topo">Topographic</option><option value="imagery">Imagery</option></select></label>
+      <label class="note">Opacity <input type="range" id="opacity" min="0.2" max="1" step="0.05" value="0.8"></label>
+      <label class="note toggle"><input type="checkbox" id="rawsOn" checked> RAWS</label>
+    </div>
+    <div id="lmap" class="lmap" role="application" aria-label="Interactive KBDI map"></div>
+    <div class="kbdi-scale" id="mscale"></div><div class="kbdi-scale-l" id="mscalel"></div>
+    <p class="note" id="mapcap"></p>
+    <p class="note" id="nomap" style="display:none">The interactive map needs the Leaflet library from cdnjs.cloudflare.com; the static figure below is the same analysis.</p>
+    <p class="note"><a id="figlink" href="#" target="_blank" rel="noopener">Static research figure (PNG) →</a></p>
+  </div>
+
+<div class="grid2 even">
+  <div class="card" id="about"></div>
+  <div class="card" id="rf"></div>
+</div>
+
+<div class="card"><h2>Zone summary</h2>
+  <p class="note">Mean, lowest and highest KBDI over each zone's land cells. As in the Texas product, the
+  share of land at or above 575 is given as a high-drought indicator.</p>
+  <div class="scroll"><table id="zones"></table></div></div>
+
+<div class="card"><h2>Recent history</h2>
+  <div class="controls"><div class="seg" id="range"><button data-r="365" class="on" type="button">1 year</button><button data-r="1095" type="button">3 years</button><button data-r="0" type="button">All</button></div>
+    <div class="seg" id="metric"><button data-m="mean" class="on" type="button">Zone mean KBDI</button><button data-m="pct" type="button" id="pctbtn">% of land ≥ Red Flag KBDI</button></div></div>
+  <div class="chart" id="zchart"></div>
+  <div class="legend" id="zlegend"></div>
+  <p class="note" id="zchartnote"></p></div>
+
+<div class="card"><h2>Against the RAWS</h2>
+  <p class="note">Remote Automatic Weather Stations (RAWS) carry their own KBDI, computed in the Fire Environment Mapping System (FEMS)
+  from the station's measured rain and temperature. Each row compares that with the map cell containing the station. Statistics cover the
+  whole checked record; see <a href="validation.html">Validation</a>.</p>
+  <div class="controls"><label class="note">Station <select id="stsel"></select></label></div>
+  <div class="chart" id="schart"></div>
+  <div class="legend"><span style="--c:var(--s1)">Map cell</span><span style="--c:var(--s2)">FEMS station KBDI</span></div>
+  <div class="scroll" style="margin-top:12px"><table id="stations"></table></div></div>
+
+<div class="card"><h2>Reading the scale</h2>
+  <div class="kbdi-scale" id="scale"></div><div class="kbdi-scale-l" id="scalel"></div>
+  <p class="note">The map colours step every 100 units. KBDI is cumulative: it rises a few units on each warm dry day and drops by
+  100 for every inch of rain after the first 0.20 inch of a wet spell. NWS Red Flag criteria use KBDI ≥ 500 in Hawaiʻi
+  (NWS Honolulu) and KBDI ≥ 600 on Guam (NWS Guam), each together with wind and humidity conditions (see the criteria card above).
+  Tropical islands with high annual rain dry quickly between rains, so
+  values here run higher than mainland experience would suggest; compare a place against its own history, not against another climate.</p></div>
+
+<footer><p>Built daily from public data: HCDP (University of Hawaiʻi), NOAA MRMS, RTMA and GHCN-Daily, Iowa Environmental Mesonet,
+PRISM Climate Group, the Rainfall Atlas of Hawaiʻi, and USDA Forest Service FEMS. Full sources and references are on the
+<a href="methods.html#refs">Methods</a> page. Experimental and not peer reviewed; offered without warranty.</p>
+<p id="gen"></p></footer>
+</div>
+<script src="data/site_data.js"></script>
+<script src="app.js"></script>
+<script>KBDIapp.index();</script>
+</body></html>
